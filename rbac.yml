@@ -1,0 +1,31 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: service-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["nodes", "services"]
+  verbs: ["get", "list"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: kube-system
+  name: service-reader
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: kube-system
+  name: service-reader-binding
+subjects:
+- kind: User
+  name: "system:serviceaccount:kube-system:service-reader"
+  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: "service-reader"
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: service-reader
+  apiGroup: rbac.authorization.k8s.io
