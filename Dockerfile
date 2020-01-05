@@ -16,11 +16,11 @@ RUN addgroup -S app && adduser -D -s /bin/false -G app app
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-COPY --from=builder /go/src/envoy_nodeport_eds/envoy_nodeport_eds /envoy_nodeport_eds
+COPY --from=builder /go/src/envoy_nodeport_eds/envoy_nodeport_eds /usr/bin/envoy_nodeport_eds
 
-RUN chown app:app /envoy_nodeport_eds && \
-  chmod +x /envoy_nodeport_eds
+RUN chown app:app /usr/bin/envoy_nodeport_eds && \
+  chmod +x /usr/bin/envoy_nodeport_eds
 
 USER app
 
-CMD ["/envoy_nodeport_eds"]
+CMD ["envoy_nodeport_eds"]
