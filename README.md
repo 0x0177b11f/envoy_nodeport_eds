@@ -78,7 +78,7 @@ static_resources:
                 "@type": type.googleapis.com/envoy.config.accesslog.v2.FileAccessLog
                 path: /dev/stdout
   clusters:
-  - name: web  # <- this is k8s nodeport service name
+  - name: web  # <- this is k8s nodeport service port name
     connect_timeout: 30s
     lb_policy: ROUND_ROBIN
     type: EDS
@@ -89,7 +89,7 @@ static_resources:
           grpc_services:
             envoy_grpc:
               cluster_name: xds_cluster
-  - name: websecure  # <- this is k8s nodeport service name
+  - name: websecure  # <- this is k8s nodeport service port name
     connect_timeout: 30s
     lb_policy: ROUND_ROBIN
     type: EDS
