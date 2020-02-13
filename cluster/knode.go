@@ -14,10 +14,10 @@ type NodeportServiceInfo struct {
 	Port    uint32
 }
 
-func GetAllNodePortService(kubeconfig, namespace, servicename *string) []NodeportServiceInfo {
+func GetAllNodePortService(kubeconfig, namespace, servicename *string) ([]NodeportServiceInfo, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	ns := func() string {
@@ -29,12 +29,12 @@ func GetAllNodePortService(kubeconfig, namespace, servicename *string) []Nodepor
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	services, err := clientset.CoreV1().Services(ns).List(metav1.ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	var endpoints []NodeportServiceInfo
@@ -62,23 +62,24 @@ func GetAllNodePortService(kubeconfig, namespace, servicename *string) []Nodepor
 			})
 		}
 	}
-	return endpoints
+
+	return endpoints, nil
 }
 
-func GetAllNodeAddress(kubeconfig *string, addresstype corev1.NodeAddressType) []string {
+func GetAllNodeAddress(kubeconfig *string, addresstype corev1.NodeAddressType) ([]string, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	var address []string
@@ -94,5 +95,5 @@ func GetAllNodeAddress(kubeconfig *string, addresstype corev1.NodeAddressType) [
 			}
 		}
 	}
-	return address
+	return address, nil
 }

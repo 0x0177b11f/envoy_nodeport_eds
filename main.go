@@ -62,9 +62,24 @@ func main() {
 
 	ch := make(chan []config.EndpointAddress)
 	go func() {
+
+		sleep := func() {
+			time.Sleep(time.Duration(*intervals) * time.Second)
+		}
+
 		for {
-			address := cluster.GetAllNodeAddress(kubeconfig, corev1.NodeAddressType(*addressType))
-			nodeports := cluster.GetAllNodePortService(kubeconfig, namespace, serviceName)
+			address, err := cluster.GetAllNodeAddress(kubeconfig, corev1.NodeAddressType(*addressType))
+			if err != nil {
+				sleep()
+				continue
+			}
+
+			nodeports, err := cluster.GetAllNodePortService(kubeconfig, namespace, serviceName)
+			if err != nil {
+				sleep()
+				continue
+			}
+
 			var EndpointList []config.EndpointAddress
 			for _, addre := range address {
 				for _, nodeport := range nodeports {
@@ -76,11 +91,12 @@ func main() {
 					})
 				}
 			}
+
 			if len(EndpointList) > 0 {
 				ch <- EndpointList
 			}
 
-			time.Sleep(time.Duration(*intervals) * time.Second)
+			sleep()
 		}
 	}()
 
