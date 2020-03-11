@@ -22,7 +22,7 @@
 
 ## k8s ServiceAccount Sample
 
-[rbac.yaml](./rbac.yaml)
+[rbac.yaml](./rbac.yml)
 
 ## Envoy Config Sample
 
