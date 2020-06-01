@@ -85,7 +85,7 @@ func GetAllNodeAddress(kubeconfig *string, addresstype corev1.NodeAddressType) [
 	for _, node := range nodes.Items {
 		nodeinfo, err := clientset.CoreV1().Nodes().Get(node.Name, metav1.GetOptions{})
 		if err != nil {
-
+			continue
 		}
 
 		for _, nodeaddress := range nodeinfo.Status.Addresses {
