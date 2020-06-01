@@ -64,10 +64,18 @@ func main() {
 	go func() {
 		for {
 			func() {
-				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
+				defer func() {
+					if r := recover(); r != nil {
+						fmt.Println("Error: ", r)
+					}
+				}()
+
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 				defer cancel()
+
 				address := cluster.GetAllNodeAddress(ctx, kubeconfig, corev1.NodeAddressType(*addressType))
 				nodeports := cluster.GetAllNodePortService(ctx, kubeconfig, namespace, serviceName)
+
 				var EndpointList []config.EndpointAddress
 				for _, addre := range address {
 					for _, nodeport := range nodeports {
