@@ -11,14 +11,14 @@ import (
 	"path/filepath"
 	"time"
 
-	cluster "envoy_nodeport_eds/cluster"
-	config "envoy_nodeport_eds/config"
-	util "envoy_nodeport_eds/util"
+	cluster "github.com/0x0177b11f/envoy_nodeport_eds/cluster"
+	config "github.com/0x0177b11f/envoy_nodeport_eds/config"
+	util "github.com/0x0177b11f/envoy_nodeport_eds/util"
 
 	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	cache "github.com/envoyproxy/go-control-plane/pkg/cache"
-	xds "github.com/envoyproxy/go-control-plane/pkg/server"
+	cache "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
 	grpc "google.golang.org/grpc"
 
 	corev1 "k8s.io/api/core/v1"
@@ -63,22 +63,26 @@ func main() {
 	ch := make(chan []config.EndpointAddress)
 	go func() {
 		for {
-			address := cluster.GetAllNodeAddress(kubeconfig, corev1.NodeAddressType(*addressType))
-			nodeports := cluster.GetAllNodePortService(kubeconfig, namespace, serviceName)
-			var EndpointList []config.EndpointAddress
-			for _, addre := range address {
-				for _, nodeport := range nodeports {
-					EndpointList = append(EndpointList, config.EndpointAddress{
-						Name:     nodeport.Name,
-						Address:  addre,
-						Port:     nodeport.Port,
-						Protocol: util.ConvKubePortoclToEnvoyPortocl(nodeport.Protocl),
-					})
+			func() {
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
+				defer cancel()
+				address := cluster.GetAllNodeAddress(ctx, kubeconfig, corev1.NodeAddressType(*addressType))
+				nodeports := cluster.GetAllNodePortService(ctx, kubeconfig, namespace, serviceName)
+				var EndpointList []config.EndpointAddress
+				for _, addre := range address {
+					for _, nodeport := range nodeports {
+						EndpointList = append(EndpointList, config.EndpointAddress{
+							Name:     nodeport.Name,
+							Address:  addre,
+							Port:     nodeport.Port,
+							Protocol: util.ConvKubePortoclToEnvoyPortocl(nodeport.Protocl),
+						})
+					}
 				}
-			}
-			if len(EndpointList) > 0 {
-				ch <- EndpointList
-			}
+				if len(EndpointList) > 0 {
+					ch <- EndpointList
+				}
+			}()
 
 			time.Sleep(time.Duration(*intervals) * time.Second)
 		}

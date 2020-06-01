@@ -3,11 +3,12 @@ package config
 import (
 	"log"
 
-	cluster "envoy_nodeport_eds/cluster"
+	cluster "github.com/0x0177b11f/envoy_nodeport_eds/cluster"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
-	cache "github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	cache "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 )
 
 type EndpointAddress struct {
@@ -19,20 +20,20 @@ type EndpointAddress struct {
 
 type NodeConfig struct {
 	node      string
-	endpoints []cache.Resource
-	clusters  []cache.Resource
-	routes    []cache.Resource
-	listeners []cache.Resource
-	runtimes  []cache.Resource
+	endpoints []types.Resource
+	clusters  []types.Resource
+	routes    []types.Resource
+	listeners []types.Resource
+	runtimes  []types.Resource
 }
 
 func NewNodeConfig(NodeName string) *NodeConfig {
 	return &NodeConfig{
 		node:      NodeName,
-		endpoints: []cache.Resource{},
-		clusters:  []cache.Resource{},
-		routes:    []cache.Resource{},
-		listeners: []cache.Resource{},
+		endpoints: []types.Resource{},
+		clusters:  []types.Resource{},
+		routes:    []types.Resource{},
+		listeners: []types.Resource{},
 	}
 }
 

@@ -294,6 +294,16 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for MergeSlashes
 
+	if v, ok := interface{}(m.GetRequestIdExtension()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "RequestIdExtension",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.RouteSpecifier.(type) {
 
 	case *HttpConnectionManager_Rds:
@@ -897,6 +907,83 @@ var _ interface {
 	ErrorName() string
 } = HttpFilterValidationError{}
 
+// Validate checks the field values on RequestIDExtension with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RequestIDExtension) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RequestIDExtensionValidationError{
+				field:  "TypedConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RequestIDExtensionValidationError is the validation error returned by
+// RequestIDExtension.Validate if the designated constraints aren't met.
+type RequestIDExtensionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RequestIDExtensionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RequestIDExtensionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RequestIDExtensionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RequestIDExtensionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RequestIDExtensionValidationError) ErrorName() string {
+	return "RequestIDExtensionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RequestIDExtensionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRequestIDExtension.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RequestIDExtensionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RequestIDExtensionValidationError{}
+
 // Validate checks the field values on HttpConnectionManager_Tracing with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -948,6 +1035,31 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManager_TracingValidationError{
 				field:  "MaxPathTagLength",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetCustomTags() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpConnectionManager_TracingValidationError{
+					field:  fmt.Sprintf("CustomTags[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManager_TracingValidationError{
+				field:  "Provider",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

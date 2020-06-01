@@ -1,6 +1,8 @@
 package cluster
 
 import (
+	"context"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -14,7 +16,7 @@ type NodeportServiceInfo struct {
 	Port    uint32
 }
 
-func GetAllNodePortService(kubeconfig, namespace, servicename *string) []NodeportServiceInfo {
+func GetAllNodePortService(ctx context.Context, kubeconfig, namespace, servicename *string) []NodeportServiceInfo {
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
 		panic(err.Error())
@@ -32,7 +34,7 @@ func GetAllNodePortService(kubeconfig, namespace, servicename *string) []Nodepor
 		panic(err.Error())
 	}
 
-	services, err := clientset.CoreV1().Services(ns).List(metav1.ListOptions{})
+	services, err := clientset.CoreV1().Services(ns).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -65,7 +67,7 @@ func GetAllNodePortService(kubeconfig, namespace, servicename *string) []Nodepor
 	return endpoints
 }
 
-func GetAllNodeAddress(kubeconfig *string, addresstype corev1.NodeAddressType) []string {
+func GetAllNodeAddress(ctx context.Context, kubeconfig *string, addresstype corev1.NodeAddressType) []string {
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
 		panic(err.Error())
@@ -76,14 +78,14 @@ func GetAllNodeAddress(kubeconfig *string, addresstype corev1.NodeAddressType) [
 		panic(err.Error())
 	}
 
-	nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+	nodes, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
 
 	var address []string
 	for _, node := range nodes.Items {
-		nodeinfo, err := clientset.CoreV1().Nodes().Get(node.Name, metav1.GetOptions{})
+		nodeinfo, err := clientset.CoreV1().Nodes().Get(ctx, node.Name, metav1.GetOptions{})
 		if err != nil {
 			continue
 		}
