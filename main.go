@@ -27,28 +27,19 @@ import (
 
 func main() {
 	var kubeconfig *string
+
 	if home := homeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file")
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
-	var addressType *string
-	addressType = flag.String("addressType", string(corev1.NodeInternalIP), "node address type")
 
-	var namespace *string
-	namespace = flag.String("namespace", "default", "kube namespace")
-
-	var serviceName *string
-	serviceName = flag.String("serviceName", "*", "service name (default is all nodeport service)")
-
-	var intervals *int
-	intervals = flag.Int("intervals", 30, "update intervals")
-
-	var listenerAddress *string
-	listenerAddress = flag.String("listener", "0.0.0.0", "listener address")
-
-	var port *uint
-	port = flag.Uint("port", 8000, "listener port")
+	var addressType *string = flag.String("addressType", string(corev1.NodeInternalIP), "node address type")
+	var namespace *string = flag.String("namespace", "default", "kube namespace")
+	var serviceName *string = flag.String("serviceName", "*", "service name (default is all nodeport service)")
+	var intervals *int = flag.Int("intervals", 30, "update intervals")
+	var listenerAddress *string = flag.String("listener", "0.0.0.0", "listener address")
+	var port *uint = flag.Uint("port", 8000, "listener port")
 
 	flag.Parse()
 
